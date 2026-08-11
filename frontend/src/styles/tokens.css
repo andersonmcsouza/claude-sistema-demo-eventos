@@ -1,21 +1,21 @@
-/* Design tokens · DevConf Vertigo 2026 */
+/* Design tokens · DevConf Vertigo 2026 · Marca Vertigo (vertigo.com.br) */
 :root {
   /* Marca */
-  --cor-primaria: #6d28d9;
-  --cor-primaria-escura: #4c1d95;
-  --cor-fundo: #f8f7fc;
+  --cor-primaria: #0068ff;
+  --cor-primaria-escura: #0050c8;
+  --cor-fundo: #f5f7fa;
   --cor-superficie: #ffffff;
-  --cor-texto: #1e1b2e;
-  --cor-texto-suave: #6b6580;
-  --cor-borda: #e4e0f0;
+  --cor-texto: #0d0d12;
+  --cor-texto-suave: #5c6470;
+  --cor-borda: #e3e8ef;
   --cor-erro: #b91c1c;
   --cor-erro-fundo: #fee2e2;
 
   /* Status de inscrição */
   --cor-status-pendente: #d97706;
   --cor-status-confirmada: #16a34a;
-  --cor-status-lista-de-espera: #2563eb;
-  --cor-status-check-in-feito: #6d28d9;
+  --cor-status-lista-de-espera: #64748b;
+  --cor-status-check-in-feito: #0068ff;
 
   /* Tipografia */
   --fonte-titulo: 'Segoe UI', 'Inter', system-ui, sans-serif;
@@ -29,5 +29,5 @@
   --espaco-4: 1.5rem;
   --espaco-5: 2.5rem;
   --raio: 10px;
-  --sombra: 0 1px 3px rgba(30, 27, 46, 0.1);
+  --sombra: 0 1px 3px rgba(13, 13, 18, 0.08);
 }

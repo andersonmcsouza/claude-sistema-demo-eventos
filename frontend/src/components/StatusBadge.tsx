@@ -1,6 +1,6 @@
 import type { Status } from '../api/inscricoes'
 
-const ROTULOS: Record<Status, string> = {
+export const ROTULOS: Record<Status, string> = {
   pendente: 'Pendente',
   confirmada: 'Confirmada',
   lista_de_espera: 'Lista de espera',

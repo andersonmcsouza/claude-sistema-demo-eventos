@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   listarAcompanhantes,
   mudarStatus,
@@ -8,9 +8,12 @@ import {
   type InscricaoDetalhe,
   type Status,
 } from '../api/inscricoes'
-import { StatusBadge } from '../components/StatusBadge'
+import { ROTULOS, StatusBadge } from '../components/StatusBadge'
 
 const STATUS: Status[] = ['pendente', 'confirmada', 'lista_de_espera', 'check_in_feito']
+
+const formatarData = (iso: string) =>
+  new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
 
 export function DetalheInscricao() {
   const { id } = useParams()
@@ -41,6 +44,9 @@ export function DetalheInscricao() {
 
   return (
     <div className="container">
+      <Link to="/" className="voltar">
+        ← Voltar para inscrições
+      </Link>
       <h2>{inscricao.nome_completo || '(sem nome)'}</h2>
       <div className="cartao">
         <p>
@@ -50,6 +56,9 @@ export function DetalheInscricao() {
           <strong>Categoria:</strong> {inscricao.categoria}
         </p>
         <p>
+          <strong>Inscrito em:</strong> {formatarData(inscricao.criado_em)}
+        </p>
+        <p>
           <strong>Status:</strong> <StatusBadge status={inscricao.status} />
         </p>
         <label>
@@ -57,7 +66,7 @@ export function DetalheInscricao() {
           <select value={novoStatus} onChange={(e) => setNovoStatus(e.target.value as Status)}>
             {STATUS.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {ROTULOS[s]}
               </option>
             ))}
           </select>
@@ -68,7 +77,7 @@ export function DetalheInscricao() {
       <div className="cartao">
         <h3>Acompanhantes ({inscricao.total_acompanhantes})</h3>
         {acompanhantes.length === 0 ? (
-          <p>Nenhum acompanhante.</p>
+          <p className="vazio">Nenhum acompanhante.</p>
         ) : (
           <ul>
             {acompanhantes.map((a) => (

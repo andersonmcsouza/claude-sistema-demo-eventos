@@ -9,16 +9,82 @@ body {
   color: var(--cor-texto);
 }
 
-.container { max-width: 880px; margin: 0 auto; padding: var(--espaco-4); }
+.container { max-width: 1000px; margin: 0 auto; padding: var(--espaco-4); }
 
 .topo {
-  background: var(--cor-primaria);
-  color: #fff;
-  padding: var(--espaco-3) 0;
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+  padding: var(--espaco-2) 0;
 }
-.topo .container { display: flex; justify-content: space-between; align-items: center; padding-top: 0; padding-bottom: 0; }
-.topo h1 { font-family: var(--fonte-titulo); font-weight: var(--peso-titulo); font-size: 1.15rem; margin: var(--espaco-2) 0; }
-.topo a { color: #fff; text-decoration: none; font-size: 0.9rem; }
+.topo .container { display: flex; justify-content: space-between; align-items: center; gap: var(--espaco-3); padding-top: var(--espaco-2); padding-bottom: var(--espaco-2); }
+.marca { display: flex; align-items: center; gap: var(--espaco-3); text-decoration: none; color: var(--cor-texto); }
+.marca img { height: 34px; display: block; }
+.marca span {
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-titulo);
+  font-size: 0.95rem;
+  border-left: 1px solid var(--cor-borda);
+  padding-left: var(--espaco-3);
+  white-space: nowrap;
+}
+.topo nav { display: flex; gap: var(--espaco-3); }
+.topo nav a {
+  color: var(--cor-texto-suave);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: var(--espaco-1) 0;
+  border-bottom: 2px solid transparent;
+}
+.topo nav a:hover { color: var(--cor-primaria); }
+.topo nav a.ativo { color: var(--cor-primaria); border-bottom-color: var(--cor-primaria); }
+
+.painel {
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+}
+.painel-grade {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: var(--espaco-5);
+  align-items: start;
+  padding-top: var(--espaco-3);
+  padding-bottom: var(--espaco-3);
+}
+.painel-tile { display: flex; flex-direction: column; gap: var(--espaco-1); }
+.painel-numero { font-size: 2rem; font-weight: var(--peso-titulo); line-height: 1.1; }
+.painel-rotulo {
+  color: var(--cor-texto-suave);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.painel-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-1) var(--espaco-4);
+  font-size: 0.88rem;
+}
+.painel-lista li { display: flex; align-items: center; gap: var(--espaco-2); color: var(--cor-texto-suave); }
+.painel-lista strong { color: var(--cor-texto); }
+.painel-ponto { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+@media (max-width: 720px) {
+  .painel-grade { grid-template-columns: 1fr; gap: var(--espaco-3); }
+}
+
+.voltar {
+  display: inline-block;
+  margin-top: var(--espaco-3);
+  color: var(--cor-primaria);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.voltar:hover { color: var(--cor-primaria-escura); text-decoration: underline; }
 
 .cartao {
   background: var(--cor-superficie);
@@ -29,10 +95,19 @@ body {
   margin-top: var(--espaco-4);
 }
 
+.tabela-rolagem { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: var(--espaco-2) var(--espaco-3); border-bottom: 1px solid var(--cor-borda); }
+th, td { text-align: left; padding: var(--espaco-2) var(--espaco-3); border-bottom: 1px solid var(--cor-borda); white-space: nowrap; }
 th { color: var(--cor-texto-suave); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
 tr:hover td { background: var(--cor-fundo); }
+td a { color: var(--cor-primaria); }
+
+.vazio {
+  color: var(--cor-texto-suave);
+  text-align: center;
+  padding: var(--espaco-5) var(--espaco-3);
+  margin: 0;
+}
 
 .badge {
   display: inline-block;
@@ -52,6 +127,8 @@ input, select {
   border-radius: var(--raio);
   font: inherit;
 }
+
+:focus-visible { outline: 2px solid var(--cor-primaria); outline-offset: 2px; }
 
 button {
   margin-top: var(--espaco-4);

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { criarInscricao, ErroDaApi, type Categoria } from '../api/inscricoes'
 
 export function NovaInscricao() {
@@ -22,6 +22,9 @@ export function NovaInscricao() {
 
   return (
     <div className="container">
+      <Link to="/" className="voltar">
+        ← Voltar para inscrições
+      </Link>
       <h2>Nova inscrição</h2>
       <form className="cartao" onSubmit={enviar}>
         <label>
