@@ -104,8 +104,8 @@ scripts/                 # warmup.sh, reset-db.sh
 | Campo            | Tipo          | Observação                                |
 |------------------|---------------|-------------------------------------------|
 | `id`             | int, PK       |                                           |
-| `nome_completo`  | String(120)   | NOT NULL, mas **string vazia é aceita**   |
-| `email`          | String(120)   | NOT NULL, **sem validação de formato**    |
+| `nome_completo`  | String(120)   | obrigatório — a API rejeita vazio ou só espaços |
+| `email`          | String(120)   | obrigatório — formato validado no service |
 | `categoria`      | enum          | `participante`, `palestrante`, `vip`, `imprensa` |
 | `status`         | enum          | default `pendente`                        |
 | `criado_em`      | DateTime      | default `datetime.now(timezone.utc)` — coluna **sem timezone**, grava naive |
@@ -213,10 +213,10 @@ sequenceDiagram
     Cliente->>Router: POST /api/inscricoes
     Note over Cliente,Router: CORS libera apenas http://localhost:13000
 
-    Router->>Router: valida o corpo com o schema InscricaoCriar
-    Note right of Router: só checa tipos — formato de e-mail NÃO é validado
+    Router->>Router: valida os tipos com o schema InscricaoCriar
+    Note right of Router: só tipos — as regras de nome e e-mail<br/>ficam no service, conforme o CLAUDE.md
 
-    opt corpo inválido para os tipos declarados
+    opt tipo inválido, por exemplo categoria fora do enum
         Router-->>Cliente: 422 com detail
         Cliente-->>Form: ErroDaApi com a lista de mensagens
         Form-->>Part: erros no formulário e o fluxo para aqui
@@ -224,6 +224,15 @@ sequenceDiagram
 
     Router->>Service: service.criar(dados)
     Note over Router,Service: Depends(get_service) monta Service(Repo(db))<br/>com a sessão vinda de get_db
+    Service->>Service: _validar acumula falhas de nome e e-mail
+
+    opt nome vazio ou e-mail inválido
+        Service-->>Router: DadosInvalidos com todas as mensagens
+        Router-->>Cliente: 422 com detail [{msg}] em português
+        Cliente-->>Form: ErroDaApi
+        Form-->>Part: "Informe o nome completo." e afins, tudo de uma vez
+    end
+
     Service->>Service: monta Inscricao com status pendente
     Note right of Service: aqui mora a regra: o status inicial<br/>é decisão do service, não do cliente
     Service->>Repo: repo.criar(inscricao)
@@ -366,19 +375,30 @@ PATCH /api/inscricoes/99999/status   → HTTP 500 Internal Server Error
 Correção certa: uma exceção `InscricaoNaoEncontrada` em `services/excecoes.py`, levantada
 no **service**, mapeada para 404 no router. Nenhum teste cobre esse caminho hoje.
 
-**2. Nenhuma validação de entrada na criação.**
-`InscricaoCriar` declara `nome_completo: str` e `email: str` — sem `EmailStr`, sem
-tamanho mínimo. Isso passa:
+**2. ~~Nenhuma validação de entrada na criação.~~ RESOLVIDO.**
+`InscricaoService._validar` rejeita nome vazio ou só com espaços, e-mail ausente ou
+com formato inválido, e valores acima de 120 caracteres. A validação fica no **service**
+(regra do `CLAUDE.md`), levanta `DadosInvalidos` com **todas** as falhas de uma vez, e o
+router devolve **422** no formato `detail: [{"msg": "..."}]` — o mesmo que o front já
+sabia exibir, então o formulário mostra as mensagens sem ter precisado mudar.
 
 ```
-POST /api/inscricoes  {"nome_completo":"","email":"isso-nao-e-email",...}  → HTTP 201
+POST /api/inscricoes  {"nome_completo":"","email":"isso-nao-e-email",...}
+  → HTTP 422 {"detail":[{"msg":"Informe o nome completo."},
+                        {"msg":"Informe um e-mail válido."}]}
 ```
 
-`pydantic[email]` **já está** nas dependências, então trocar para `EmailStr` é barato.
-Atenção: o seed tem registros sujos de propósito (uma inscrição com nome vazio e a
-"Mônica Lima" com email sem `@`) — provavelmente para exercitar o fallback `(sem nome)`
-das telas. Se apertar a validação, decida o que fazer com esses registros e com os dados
-já gravados.
+Nome e e-mail são gravados com `strip()` aplicado.
+
+Duas ressalvas que continuam valendo:
+
+- **o seed não passa pelo service** — ele monta os models direto, então os registros
+  sujos de propósito (a inscrição com nome vazio e a "Mônica Lima" com e-mail sem `@`)
+  continuam carregando. Foi decisão consciente mantê-los: eles exercitam o fallback
+  `(sem nome)` das telas. O mesmo vale para dados já gravados antes da validação;
+- **erro de tipo ainda responde em inglês.** Se o cliente mandar `categoria` fora do
+  enum, quem responde é o Pydantic, com `"Input should be 'participante'…"`. Não afeta o
+  formulário (o `<select>` só oferece valores válidos), mas um cliente de API veria isso.
 
 **3. Acompanhante em inscrição inexistente devolve 500.**
 `AcompanhanteService.adicionar` não verifica se a inscrição existe; a FK do Postgres

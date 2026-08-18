@@ -9,7 +9,7 @@ from app.schemas.inscricao import (
     InscricaoOut,
     StatusPatch,
 )
-from app.services.excecoes import TransicaoInvalida
+from app.services.excecoes import DadosInvalidos, TransicaoInvalida
 from app.services.inscricao_service import InscricaoService
 
 router = APIRouter(prefix="/api/inscricoes", tags=["inscricoes"])
@@ -31,7 +31,13 @@ def detalhar(inscricao_id: int, service: InscricaoService = Depends(get_service)
 
 @router.post("", response_model=InscricaoOut, status_code=201)
 def criar(dados: InscricaoCriar, service: InscricaoService = Depends(get_service)):
-    return service.criar(dados)
+    try:
+        return service.criar(dados)
+    except DadosInvalidos as erro:
+        # Mesmo formato do 422 do FastAPI, que o front já sabe exibir.
+        raise HTTPException(
+            status_code=422, detail=[{"msg": mensagem} for mensagem in erro.mensagens]
+        )
 
 
 @router.patch("/{inscricao_id}/status", response_model=InscricaoOut)

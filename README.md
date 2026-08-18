@@ -40,13 +40,17 @@ Toda inscrição nasce `pendente`. As transições válidas são:
 Qualquer outra transição responde **409** com a mensagem de erro. Não há volta
 atrás nem cancelamento.
 
+Na criação, nome e e-mail são validados no service: vazios, só espaços ou e-mail
+com formato inválido respondem **422** com as mensagens em português, todas de
+uma vez, no formato `detail: [{"msg": "..."}]`.
+
 ## Endpoints
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | `GET` | `/health` | Liveness |
 | `GET` | `/api/inscricoes` | Lista inscrições |
-| `POST` | `/api/inscricoes` | Cria inscrição (formulário público) → 201 |
+| `POST` | `/api/inscricoes` | Cria inscrição (formulário público) → 201, ou 422 se inválida |
 | `GET` | `/api/inscricoes/{id}` | Detalhe + total de acompanhantes |
 | `PATCH` | `/api/inscricoes/{id}/status` | Muda o status → 409 se inválido |
 | `GET` | `/api/inscricoes/{id}/acompanhantes` | Lista acompanhantes da inscrição |
